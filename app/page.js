@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
+import Link from 'next/link';
 import * as XLSX from "xlsx";
 import {
   FileSpreadsheet, Upload, FileText, ShieldCheck, ShieldAlert, Lock, Check, Download,
@@ -398,7 +399,11 @@ export default function App() {
             <div style={{ width: 36, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${C.emeraldBright}, ${C.emerald})`, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 6px 16px ${C.emerald}33` }}><FileSpreadsheet size={20} color="#fff" /></div>
             <span style={{ fontFamily: FD, fontWeight: 700, fontSize: 19, letterSpacing: -0.3 }}>Sheetly</span>
           </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          <Link href="/pricing" style={{ fontFamily: FB, fontSize: 14, fontWeight: 600, color: C.inkSoft, textDecoration: "none" }}>Pricing</Link>
+          <Link href="/about" style={{ fontFamily: FB, fontSize: 14, fontWeight: 600, color: C.inkSoft, textDecoration: "none" }}>About</Link>
           <div style={{ display: "flex", alignItems: "center", gap: 8, background: C.emeraldWash, padding: "6px 12px", borderRadius: 99 }}><Lock size={12} color={C.emeraldDeep} /><span style={{ fontFamily: FB, fontSize: 11.5, fontWeight: 700, color: C.emeraldDeep }}>Private & secure</span></div>
+        </div>
         </div>
       </div>
 
@@ -445,6 +450,29 @@ export default function App() {
                 <p style={{ fontFamily: FB, fontSize: 14.5, color: "#B8BEB8", marginTop: 10, maxWidth: 470, margin: "10px auto 0", lineHeight: 1.55 }}>Free to try. Individuals get the Personal plan; loan agents & CAs use the Business plan for borrower reports.</p>
               </div>
             </div>
+          </div>
+
+          {/* NAVIGATION LINKS — mobile friendly */}
+          <div style={{ maxWidth: 840, margin: "0 auto", padding: "0 22px 20px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              {[
+                { href: "/pricing", emoji: "💳", title: "Pricing", sub: "Free, Personal & Business plans" },
+                { href: "/about", emoji: "👋", title: "About", sub: "What Sheetly is & how it works" },
+                { href: "/privacy", emoji: "🔒", title: "Privacy Policy", sub: "How we protect your data" },
+                { href: "/terms", emoji: "📋", title: "Terms of Service", sub: "Rules & responsibilities" },
+              ].map(x => (
+                <Link key={x.href} href={x.href} style={{ textDecoration: "none", background: C.card, border: `1px solid ${C.line}`, borderRadius: 14, padding: "16px 16px", display: "block", boxShadow: "0 4px 14px rgba(0,0,0,0.04)" }}>
+                  <div style={{ fontSize: 22, marginBottom: 6 }}>{x.emoji}</div>
+                  <div style={{ fontFamily: FD, fontWeight: 600, fontSize: 15, color: C.ink, marginBottom: 4 }}>{x.title}</div>
+                  <div style={{ fontFamily: FB, fontSize: 12.5, color: C.inkFaint, lineHeight: 1.4 }}>{x.sub}</div>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* FOOTER */}
+          <div style={{ borderTop: `1px solid ${C.line}`, background: C.bg2, padding: "24px 22px", textAlign: "center" }}>
+            <div style={{ fontFamily: FB, fontSize: 12.5, color: C.inkFaint }}>© 2025 Sheetly · Made in Guwahati, Assam 🇮🇳</div>
           </div>
         </>
       )}
