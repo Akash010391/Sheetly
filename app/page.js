@@ -2,6 +2,8 @@
 
 import React, { useState, useRef } from "react";
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { supabase } from './lib/supabase';
 import * as XLSX from "xlsx";
 import {
   FileSpreadsheet, Upload, FileText, ShieldCheck, ShieldAlert, Lock, Check, Download,
@@ -382,6 +384,18 @@ function AnalyzeTool({ goHub }) {
 /* ============================== HUB / ROUTER ============================== */
 export default function App() {
   const [tool, setTool] = useState("hub");
+  const [user, setUser] = useState(null);
+  const [authMenuOpen, setAuthMenuOpen] = useState(false);
+  const router = useRouter();
+
+  React.useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => setUser(session?.user ?? null));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => setUser(session?.user ?? null));
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => { await supabase.auth.signOut(); setAuthMenuOpen(false); };
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Account';
   return (
     <div style={{ minHeight: "100vh", background: C.bg, color: C.ink, fontFamily: FB }}>
       <style>{`
@@ -399,11 +413,25 @@ export default function App() {
             <div style={{ width: 36, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${C.emeraldBright}, ${C.emerald})`, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 6px 16px ${C.emerald}33` }}><FileSpreadsheet size={20} color="#fff" /></div>
             <span style={{ fontFamily: FD, fontWeight: 700, fontSize: 19, letterSpacing: -0.3 }}>Sheetly</span>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <Link href="/pricing" style={{ fontFamily: FB, fontSize: 14, fontWeight: 600, color: C.inkSoft, textDecoration: "none" }}>Pricing</Link>
-          <Link href="/about" style={{ fontFamily: FB, fontSize: 14, fontWeight: 600, color: C.inkSoft, textDecoration: "none" }}>About</Link>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, background: C.emeraldWash, padding: "6px 12px", borderRadius: 99 }}><Lock size={12} color={C.emeraldDeep} /><span style={{ fontFamily: FB, fontSize: 11.5, fontWeight: 700, color: C.emeraldDeep }}>Private & secure</span></div>
-        </div>
+          {user ? (
+            <div style={{ position: "relative" }}>
+              <button onClick={() => setAuthMenuOpen(!authMenuOpen)} style={{ display: "flex", alignItems: "center", gap: 8, background: C.emeraldWash, border: `1px solid ${C.emerald}22`, borderRadius: 10, padding: "8px 13px", cursor: "pointer", fontFamily: FB, fontSize: 13.5, fontWeight: 700, color: C.emeraldDeep }}>
+                👤 {userName}
+              </button>
+              {authMenuOpen && (
+                <div style={{ position: "absolute", right: 0, top: "calc(100% + 8px)", background: C.card, border: `1px solid ${C.line}`, borderRadius: 12, padding: "8px", minWidth: 170, boxShadow: "0 12px 36px rgba(0,0,0,0.1)", zIndex: 50 }}>
+                  <div style={{ fontFamily: FB, fontSize: 12, color: C.inkFaint, padding: "6px 10px", fontWeight: 600 }}>{user.email}</div>
+                  <div style={{ height: 1, background: C.line, margin: "6px 0" }} />
+                  <button onClick={handleLogout} style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", padding: "8px 10px", cursor: "pointer", fontFamily: FB, fontSize: 13.5, fontWeight: 600, color: "#C25548", borderRadius: 8 }}>🚪 Sign out</button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <Link href="/login" style={{ fontFamily: FB, fontSize: 13.5, fontWeight: 600, color: C.inkSoft, textDecoration: "none" }}>Log in</Link>
+              <Link href="/signup" style={{ fontFamily: FB, fontSize: 13.5, fontWeight: 700, color: "#fff", background: `linear-gradient(135deg, ${C.emeraldBright}, ${C.emerald})`, padding: "9px 18px", borderRadius: 10, textDecoration: "none" }}>Sign up free</Link>
+            </div>
+          )}
         </div>
       </div>
 
@@ -451,8 +479,7 @@ export default function App() {
               </div>
             </div>
           </div>
-
-          {/* NAVIGATION LINKS — mobile friendly */}
+          {/* NAV LINKS */}
           <div style={{ maxWidth: 840, margin: "0 auto", padding: "0 22px 20px" }}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               {[
@@ -461,7 +488,7 @@ export default function App() {
                 { href: "/privacy", emoji: "🔒", title: "Privacy Policy", sub: "How we protect your data" },
                 { href: "/terms", emoji: "📋", title: "Terms of Service", sub: "Rules & responsibilities" },
               ].map(x => (
-                <Link key={x.href} href={x.href} style={{ textDecoration: "none", background: C.card, border: `1px solid ${C.line}`, borderRadius: 14, padding: "16px 16px", display: "block", boxShadow: "0 4px 14px rgba(0,0,0,0.04)" }}>
+                <Link key={x.href} href={x.href} style={{ textDecoration: "none", background: C.card, border: `1px solid ${C.line}`, borderRadius: 14, padding: "16px", display: "block", boxShadow: "0 4px 14px rgba(0,0,0,0.04)" }}>
                   <div style={{ fontSize: 22, marginBottom: 6 }}>{x.emoji}</div>
                   <div style={{ fontFamily: FD, fontWeight: 600, fontSize: 15, color: C.ink, marginBottom: 4 }}>{x.title}</div>
                   <div style={{ fontFamily: FB, fontSize: 12.5, color: C.inkFaint, lineHeight: 1.4 }}>{x.sub}</div>
@@ -469,7 +496,6 @@ export default function App() {
               ))}
             </div>
           </div>
-
           {/* FOOTER */}
           <div style={{ borderTop: `1px solid ${C.line}`, background: C.bg2, padding: "24px 22px", textAlign: "center" }}>
             <div style={{ fontFamily: FB, fontSize: 12.5, color: C.inkFaint }}>© 2025 Sheetly · Made in Guwahati, Assam 🇮🇳</div>
