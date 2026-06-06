@@ -451,7 +451,7 @@ export default function App() {
               { id: "consumer", Icon: PieChart, tag: "For everyone & small businesses", t: "Understand Your Statement", d: "See where your money went, catch hidden charges and wrong deductions, check it's genuine, and export to Excel.", feats: ["Where your money went", "Hidden-charge & deduction finder", "Fake-statement check + Ask anything"] },
               { id: "analyze", Icon: Gauge, tag: "For loan agents, DSAs & CAs", t: "Analyze a Borrower", d: "Upload 6 months and get a full financial-health and loan-eligibility report in 30 seconds.", feats: ["Salary, EMIs & bounces", "Loan eligibility + health score", "Fraud check + downloadable report"] },
             ].map((x) => (
-              <div key={x.id} onClick={() => setTool(x.id)} style={{ background: C.card, border: `1px solid ${C.line}`, borderRadius: 20, padding: 24, boxShadow: "0 12px 36px rgba(0,0,0,0.05)", cursor: "pointer", display: "flex", flexDirection: "column" }}>
+              <div key={x.id} onClick={() => { if (!user) { router.push('/login'); } else { setTool(x.id); } }} style={{ background: C.card, border: `1px solid ${C.line}`, borderRadius: 20, padding: 24, boxShadow: "0 12px 36px rgba(0,0,0,0.05)", cursor: "pointer", display: "flex", flexDirection: "column" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <div style={{ width: 48, height: 48, borderRadius: 13, background: `linear-gradient(135deg, ${C.emeraldBright}, ${C.emerald})`, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 8px 20px ${C.emerald}33` }}><x.Icon size={24} color="#fff" /></div>
                   <span style={{ fontFamily: FB, fontSize: 10.5, fontWeight: 700, color: C.emeraldDeep, background: C.emeraldWash, padding: "5px 10px", borderRadius: 99 }}>{x.tag}</span>
@@ -459,7 +459,7 @@ export default function App() {
                 <div style={{ fontFamily: FD, fontWeight: 700, fontSize: 21, marginTop: 16 }}>{x.t}</div>
                 <div style={{ fontFamily: FB, fontSize: 13.5, color: C.inkSoft, lineHeight: 1.55, marginTop: 7 }}>{x.d}</div>
                 <div style={{ margin: "14px 0", borderTop: `1px solid ${C.lineSoft}`, paddingTop: 14 }}>{x.feats.map((f) => <div key={f} style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0" }}><Check size={14} color={C.emerald} /><span style={{ fontFamily: FB, fontSize: 12.5, color: C.inkSoft, fontWeight: 500 }}>{f}</span></div>)}</div>
-                <div style={{ marginTop: "auto" }}><Btn kind="primary" style={{ width: "100%" }}>Open {x.t} <ArrowRight size={16} /></Btn></div>
+                <div style={{ marginTop: "auto" }}><Btn kind="primary" style={{ width: "100%" }}>{user ? <>{`Open ${x.t}`} <ArrowRight size={16} /></> : <>🔒 Sign in to access <ArrowRight size={16} /></>}</Btn></div>
               </div>
             ))}
           </div>
