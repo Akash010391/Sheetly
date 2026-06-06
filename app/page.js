@@ -156,8 +156,48 @@ function BackBar({ goHub, label }) {
 }
 
 /* ===================== TIER 1: UNDERSTAND YOUR STATEMENT ==================== */
+
+/* ========================= PRICING MODAL ================================== */
+function PricingModal({ onClose }) {
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, backdropFilter: "blur(4px)" }}>
+      <div style={{ background: C.card, borderRadius: 22, padding: "32px 28px", maxWidth: 500, width: "100%", boxShadow: "0 30px 80px rgba(0,0,0,0.2)", position: "relative", animation: "fu .3s ease both" }}>
+        <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: C.bg2, border: "none", borderRadius: 99, width: 32, height: 32, cursor: "pointer", fontSize: 18, color: C.inkSoft, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button>
+        <div style={{ textAlign: "center", marginBottom: 24 }}>
+          <div style={{ fontSize: 40, marginBottom: 10 }}>📊</div>
+          <h2 style={{ fontFamily: FD, fontWeight: 700, fontSize: 22, margin: "0 0 8px", color: C.ink }}>Your results are ready to download!</h2>
+          <p style={{ fontFamily: FB, fontSize: 14.5, color: C.inkSoft, margin: 0, lineHeight: 1.55 }}>You can explore your full results for free. Upgrade to export your Excel file, full reports, and unlock all features.</p>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+          {[
+            { name: "Personal", price: "\u20b9199/mo", tag: "For individuals", features: ["Excel & CSV export", "Ask your statement", "Hidden charges finder", "20 statements/month"], dark: false, cta: "Start Personal \u2192" },
+            { name: "Business", price: "\u20b91,999/mo", tag: "For loan agents & CAs", features: ["Everything in Personal", "Borrower analyzer", "6-month reports", "Unlimited reports"], dark: true, cta: "Start Business \u2192" },
+          ].map(p => (
+            <div key={p.name} style={{ background: p.dark ? C.ink : C.emeraldWash, borderRadius: 14, padding: "16px 14px", border: `1px solid ${p.dark ? "#2E402F" : C.emerald + "33"}` }}>
+              <div style={{ fontFamily: FB, fontSize: 10.5, fontWeight: 700, color: p.dark ? C.emeraldBright : C.emeraldDeep, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>{p.tag}</div>
+              <div style={{ fontFamily: FD, fontWeight: 700, fontSize: 16, color: p.dark ? "#fff" : C.ink, marginBottom: 2 }}>{p.name}</div>
+              <div style={{ fontFamily: FM, fontSize: 17, fontWeight: 600, color: p.dark ? C.emeraldBright : C.emerald, marginBottom: 12 }}>{p.price}</div>
+              {p.features.map(f => (
+                <div key={f} style={{ display: "flex", alignItems: "flex-start", gap: 6, marginBottom: 7 }}>
+                  <Check size={12} color={p.dark ? C.emeraldBright : C.emerald} style={{ flexShrink: 0, marginTop: 2 }} />
+                  <span style={{ fontFamily: FB, fontSize: 12.5, color: p.dark ? "#C8D9CA" : C.inkSoft, lineHeight: 1.4 }}>{f}</span>
+                </div>
+              ))}
+              <Link href="/signup" style={{ display: "block", textAlign: "center", fontFamily: FB, fontSize: 13, fontWeight: 700, color: p.dark ? C.emeraldDeep : "#fff", background: p.dark ? C.emeraldBright : C.emerald, padding: "10px", borderRadius: 9, textDecoration: "none", marginTop: 10 }}>{p.cta}</Link>
+            </div>
+          ))}
+        </div>
+        <div style={{ textAlign: "center" }}>
+          <button onClick={onClose} style={{ fontFamily: FB, fontSize: 13.5, color: C.inkSoft, background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>Maybe later — keep exploring for free</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ConsumerTool({ goHub }) {
   const [stage, setStage] = useState("idle");
+  const [showModal, setShowModal] = useState(false);
   const [step, setStep] = useState(0);
   const [rows, setRows] = useState([]);
   const [fileName, setFileName] = useState("");
@@ -232,7 +272,7 @@ function ConsumerTool({ goHub }) {
         <div style={{ animation: "fu .45s ease both" }}>
           <div style={{ background: C.card, border: `1px solid ${C.line}`, borderRadius: 18, padding: "16px 18px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 11 }}><CheckCircle2 size={22} color={C.emerald} /><div><div style={{ fontFamily: FD, fontWeight: 600, fontSize: 15.5 }}>{rows.length} transactions read & categorised</div><div style={{ fontFamily: FM, fontSize: 12, color: C.inkFaint }}>{fileName}</div></div></div>
-            <div style={{ display: "flex", gap: 9 }}><Btn kind="ghost" small onClick={reset}><RefreshCw size={14} /> New</Btn><Btn kind="primary" small onClick={dlExcel}><FileSpreadsheet size={15} /> Excel</Btn></div>
+            <div style={{ display: "flex", gap: 9 }}><Btn kind="ghost" small onClick={reset}><RefreshCw size={14} /> New</Btn><Btn kind="primary" small onClick={() => setShowModal(true)}><FileSpreadsheet size={15} /> Excel</Btn></div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 11, marginTop: 12 }}>
             {[{ l: "Period", v: range, c: C.ink, Icon: CalendarDays }, { l: "Money in", v: inr(totalIn), c: C.emerald, Icon: TrendingUp }, { l: "Money out", v: inr(totalOut), c: C.rose, Icon: TrendingDown }].map((x) => (
@@ -303,11 +343,13 @@ function ConsumerTool({ goHub }) {
       )}
     </div>
   );
+      {showModal && <PricingModal onClose={() => setShowModal(false)} />}
 }
 
 /* ===================== TIER 2: ANALYZE A BORROWER ========================= */
 function AnalyzeTool({ goHub }) {
   const [stage, setStage] = useState("idle");
+  const [showModal, setShowModal] = useState(false);
   const [step, setStep] = useState(0);
   const [drag, setDrag] = useState(false);
   const inputRef = useRef(null);
@@ -333,7 +375,7 @@ function AnalyzeTool({ goHub }) {
         <div style={{ animation: "fu .45s ease both" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
             <span style={{ background: C.goldWash, color: C.gold, padding: "3px 9px", borderRadius: 99, fontFamily: FB, fontSize: 12, fontWeight: 700 }}>SAMPLE REPORT</span>
-            <div style={{ display: "flex", gap: 9 }}><Btn kind="ghost" small onClick={() => setStage("idle")}><RefreshCw size={14} /> New borrower</Btn><Btn kind="ghost" small onClick={() => window.print()}><Printer size={14} /> PDF</Btn><Btn kind="primary" small onClick={dl}><Download size={15} /> Download</Btn></div>
+            <div style={{ display: "flex", gap: 9 }}><Btn kind="ghost" small onClick={() => setStage("idle")}><RefreshCw size={14} /> New borrower</Btn><Btn kind="ghost" small onClick={() => window.print()}><Printer size={14} /> PDF</Btn><Btn kind="primary" small onClick={() => setShowModal(true)}><Download size={15} /> Download</Btn></div>
           </div>
           <div style={{ background: `linear-gradient(135deg, ${C.ink}, #232A23)`, borderRadius: 20, padding: 24, color: "#fff", position: "relative", overflow: "hidden" }}>
             <div style={{ position: "absolute", top: -50, right: -30, width: 200, height: 200, borderRadius: 99, background: `${C.emerald}40`, filter: "blur(60px)" }} />
@@ -377,6 +419,7 @@ function AnalyzeTool({ goHub }) {
           <div style={{ textAlign: "center", fontFamily: FB, fontSize: 11.5, color: C.inkFaint, marginTop: 16 }}>Decision-support report, not a credit guarantee. Confirm figures against your lender's policy.</div>
         </div>
       )}
+      {showModal && <PricingModal onClose={() => setShowModal(false)} />}
     </div>
   );
 }
